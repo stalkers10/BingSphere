@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api';
 import { Movie } from '../../models/movie';
@@ -13,26 +13,30 @@ import { Router } from '@angular/router';
 })
 export class MovieList implements OnInit {
   movies: Movie[] = [];
+  isLoading = true;
+  error: string | null = null;
 
-  constructor(private apiService: ApiService, private router:Router) {}
+  constructor(
+    private apiService: ApiService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
     this.apiService.getMovies().subscribe({
       next: (data: any) => {
-        this.movies = data.results ? data.results : data;
+        console.log('Raw response:', data);
+        this.movies = Array.isArray(data) ? data : (data.results ?? []);
+        console.log('Movies set:', this.movies.length);
+        this.isLoading = false;
+        this.cdr.detectChanges(); // force view update
       },
       error: (err) => {
-      if (err.status === 401) {
-        localStorage.removeItem('access_token');
-        this.router.navigate(['/login']);
+        console.error('Error:', err);
+        this.error = `Error ${err.status}: ${err.message}`;
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
-    }
     });
   }
 

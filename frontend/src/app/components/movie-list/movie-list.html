@@ -3,22 +3,38 @@
     <h1>BingsSphere</h1>
   </header>
 
-  <div class="movie-grid">
-    <div class="movie-card" *ngFor="let movie of movies">
-      <img [src]="movie.thumbnail" [alt]="movie.title">
-      <div class="movie-info">
-        <h3>{{ movie.title }}</h3>
-        <p>{{ movie.release_date | date:'yyyy' }}</p>
-        <button (click)="playMovie(movie.video_url)">Play</button>
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Loading your library...</p>
+  </div>
+
+  <div *ngIf="error" class="error-state">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && movies.length === 0 && !error" class="empty-state">
+    <p>No movies found.</p>
+  </div>
+
+  <div *ngIf="!isLoading && movies.length > 0" class="movies-section">
+    <p class="section-title">Trending Now</p>
+    <div class="movie-grid">
+      <div class="movie-card" *ngFor="let movie of movies">
+        <img [src]="movie.thumbnail || 'assets/placeholder.jpg'" [alt]="movie.title">
+        <div class="movie-overlay">
+          <button class="btn-play" (click)="playMovie(movie.video_url)">▶ Play</button>
+        </div>
+        <div class="movie-info">
+          <h3>{{ movie.title }}</h3>
+          <div class="meta-row">
+            <span class="release-year">{{ movie.release_date | date:'yyyy' }}</span>
+            <span class="badge">HD</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn-play" (click)="playMovie(movie.video_url)">▶ Play</button>
+            <button class="btn-info">+ List</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div *ngIf="movies.length > 0; else noMovies" class="movie-grid">
-  </div>
-
-<ng-template #noMovies>
-  <div class="loading-state">
-    <p>Loading your library...</p>
-    </div>
-</ng-template>
 </div>
