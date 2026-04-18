@@ -1,0 +1,24 @@
+<div class="netflix-container">
+  <header>
+    <h1>BingsSphere</h1>
+  </header>
+
+  <div class="movie-grid">
+    <div class="movie-card" *ngFor="let movie of movies">
+      <img [src]="movie.thumbnail" [alt]="movie.title">
+      <div class="movie-info">
+        <h3>{{ movie.title }}</h3>
+        <p>{{ movie.release_date | date:'yyyy' }}</p>
+        <button (click)="playMovie(movie.video_url)">Play</button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="movies.length > 0; else noMovies" class="movie-grid">
+  </div>
+
+<ng-template #noMovies>
+  <div class="loading-state">
+    <p>Loading your library...</p>
+    </div>
+</ng-template>
+</div>

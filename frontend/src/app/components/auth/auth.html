@@ -1,0 +1,16 @@
+<div class="auth-container">
+      <div class="auth-card">
+        <h1>BingsSphere</h1>
+        <h2>{{ isLogin ? 'Sign In' : 'Sign Up' }}</h2>
+        
+        <input [(ngModel)]="username" placeholder="Username" type="text" />
+        <input *ngIf="!isLogin" [(ngModel)]="email" placeholder="Email" type="email" />
+        <input [(ngModel)]="password" placeholder="Password" type="password" />
+        
+        <button (click)="submit()">{{ isLogin ? 'Login' : 'Register' }}</button>
+        
+        <p (click)="isLogin = !isLogin">
+          {{ isLogin ? "New to BingsSphere? Sign up now." : "Already have an account? Sign in." }}
+        </p>
+      </div>
+    </div>
