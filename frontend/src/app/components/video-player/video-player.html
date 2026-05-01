@@ -1,7 +1,13 @@
-<div class="player-container" *ngIf="movie">
+<div class="player-container">
   <button (click)="goBack()">⬅ Back to Browse</button>
-  <h1>Watching: {{ movie.title }}</h1>
-  <div class="video-wrapper">
-    <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>
-  </div>
+
+  <div *ngIf="isLoading" class="status-msg">Loading...</div>
+  <div *ngIf="error" class="status-msg error">{{ error }}</div>
+
+  <ng-container *ngIf="movie && !isLoading">
+    <h1>Watching: {{ movie.title }}</h1>
+    <div class="video-wrapper">
+      <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </ng-container>
 </div>

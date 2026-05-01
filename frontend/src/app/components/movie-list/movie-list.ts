@@ -47,7 +47,7 @@ export class MovieList implements OnInit {
   }
 
   playMovie(movieId: number) {
-    this.router.navigate(['/watch/', movieId]);
+    this.router.navigate(['/watch', movieId]);
   }
 
 searchMovies(event: any) {

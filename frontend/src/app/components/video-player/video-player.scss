@@ -21,3 +21,9 @@ button {
     cursor: pointer;
     margin-bottom: 20px;
 }
+.status-msg {
+  color: white;
+  font-size: 1.2rem;
+  margin-top: 40px;
+  &.error { color: #e50914; }
+}
