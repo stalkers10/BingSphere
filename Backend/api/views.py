@@ -1,18 +1,17 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status, filters
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth.models import User
+from django.db import IntegrityError
 from .models import Movie, Watchlist
 from .serializers import MovieSerializer, WatchlistSerializer
-from django.contrib.auth.models import User
-from rest_framework import status, filters
-from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 class MovieViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticated]
-
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'description']
 
@@ -41,6 +40,7 @@ class RegisterView(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
 
+
 class WatchlistViewSet(viewsets.ModelViewSet):
     serializer_class = WatchlistSerializer
     permission_classes = [IsAuthenticated]
@@ -50,3 +50,12 @@ class WatchlistViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response(
+                {"error": "Movie already in your watchlist"},
+                status=status.HTTP_400_BAD_REQUEST
+            )

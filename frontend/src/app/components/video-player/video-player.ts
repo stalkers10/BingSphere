@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -16,11 +16,10 @@ export class VideoPlayer implements OnInit {
   isLoading = true;
   error: string | null = null;
   
-  constructor(private route: ActivatedRoute,private api: ApiService,private sanitizer: DomSanitizer, private router:Router) { }
+  constructor(private route: ActivatedRoute,private api: ApiService,private sanitizer: DomSanitizer, private router:Router,private cdr: ChangeDetectorRef) { }
 
  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    console.log('Video player init, id:', id);
 
     if (!id) {
       this.error = 'No movie ID found in URL';
@@ -30,18 +29,18 @@ export class VideoPlayer implements OnInit {
 
     this.api.getMovieById(Number(id)).subscribe({
       next: (data) => {
-        console.log('Movie loaded:', data);
         this.movie = data;
         this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(data.video_url);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Movie load error:', err);
         if (err.status === 401) {
           this.router.navigate(['/login']);
         } else {
           this.error = `Failed to load video — ${err.status}: ${err.statusText}`;
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       }
     });
