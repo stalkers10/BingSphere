@@ -1,0 +1,7 @@
+<div class="player-container" *ngIf="movie">
+  <button (click)="goBack()">⬅ Back to Browse</button>
+  <h1>Watching: {{ movie.title }}</h1>
+  <div class="video-wrapper">
+    <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>
+  </div>
+</div>

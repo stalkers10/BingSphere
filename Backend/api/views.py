@@ -1,18 +1,20 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets, generics
-from .models import Movie
-from .serializers import MovieSerializer
+from .models import Movie, Watchlist
+from .serializers import MovieSerializer, WatchlistSerializer
 from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework import status, filters
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 class MovieViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    permission_classes = [AllowAny]
-    authentication_classes = []
+    permission_classes = [IsAuthenticated]
+
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'description']
 
 
 class RegisterView(generics.CreateAPIView):
@@ -38,3 +40,13 @@ class RegisterView(generics.CreateAPIView):
             {"message": "User created successfully"},
             status=status.HTTP_201_CREATED
         )
+
+class WatchlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WatchlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Watchlist.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

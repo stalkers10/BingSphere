@@ -1,40 +1,53 @@
 <div class="netflix-container">
-  <header>
-    <h1>BingsSphere</h1>
+  <!-- Navigation Header -->
+  <header class="main-header">
+    <div class="logo">BINGS SPHERE</div>
+    
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Titles, people, genres" 
+        (input)="searchMovies($event)"
+      >
+    </div>
+
+    <div class="user-profile">
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
   </header>
 
-  <div *ngIf="isLoading" class="loading-state">
-    <p>Loading your library...</p>
+  <!-- Hero Section (Optional Placeholder) -->
+  <div class="hero-banner" *ngIf="movies.length > 0">
+    <div class="hero-content">
+      <h1>Featured Content</h1>
+      <p>Dive into the latest cinematic experiences curated just for you.</p>
+    </div>
   </div>
 
-  <div *ngIf="error" class="error-state">
-    <p>{{ error }}</p>
-  </div>
-
-  <div *ngIf="!isLoading && movies.length === 0 && !error" class="empty-state">
-    <p>No movies found.</p>
-  </div>
-
-  <div *ngIf="!isLoading && movies.length > 0" class="movies-section">
-    <p class="section-title">Trending Now</p>
+  <!-- Movie Grid -->
+  <main class="content-area">
+    <h2 class="row-title">Trending Now</h2>
+    
     <div class="movie-grid">
-      <div class="movie-card" *ngFor="let movie of movies">
-        <img [src]="movie.thumbnail || 'assets/placeholder.jpg'" [alt]="movie.title">
-        <div class="movie-overlay">
-          <button class="btn-play" (click)="playMovie(movie.video_url)">▶ Play</button>
-        </div>
-        <div class="movie-info">
-          <h3>{{ movie.title }}</h3>
-          <div class="meta-row">
-            <span class="release-year">{{ movie.release_date | date:'yyyy' }}</span>
-            <span class="badge">HD</span>
-          </div>
-          <div class="card-actions">
-            <button class="btn-play" (click)="playMovie(movie.video_url)">▶ Play</button>
-            <button class="btn-info">+ List</button>
+      <div class="movie-card" *ngFor="let movie of movies" (click)="playMovie(movie.id)">
+        <div class="card-inner">
+          <!-- Thumbnail with absolute URL to Django media -->
+          <img [src]="movie.thumbnail" [alt]="movie.title">
+          
+          <div class="card-overlay">
+            <div class="overlay-content">
+              <h3>{{ movie.title }}</h3>
+              <div class="meta-data">
+                <span class="year">{{ movie.release_date | date:'yyyy' }}</span>
+                <span class="quality">4K</span>
+              </div>
+              <button class="btn-play-mini">▶</button>
+              <button class="btn-add-watchlist" (click)="$event.stopPropagation(); addToWatchlist(movie.id)">+</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>

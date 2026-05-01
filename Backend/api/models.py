@@ -22,9 +22,15 @@ class Movie(models.Model):
         return self.title
 
 class Watchlist(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='watchlist')
-    movies = models.ManyToManyField(Movie, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, null=True, blank=True) 
     added_date = models.DateTimeField(auto_now_add=True)
+    #Fix 1: Remove unique_together and add a unique constraint on the combination
+    class Meta:
+        unique_together = ('user', 'movie')
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'movie'], name='unique_user_movie')
+        ]
 
     def __str__(self):
         return f"{self.user.username}'s Watchlist"
