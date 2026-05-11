@@ -1,24 +1,34 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+import { FooterComponent } from '../footer/footer';
+import { NavbarComponent } from '../navbar/navbar';
 
 @Component({
   selector: 'app-video-player',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, NavbarComponent, FooterComponent],
   templateUrl: './video-player.html',
   styleUrl: './video-player.scss',
 })
 export class VideoPlayer implements OnInit {
+  readonly userInitial = 'U';
   movie: any;
   safeUrl!: SafeResourceUrl;
   isLoading = true;
   error: string | null = null;
-  
-  constructor(private route: ActivatedRoute,private api: ApiService,private sanitizer: DomSanitizer, private router:Router,private cdr: ChangeDetectorRef) { }
 
- ngOnInit(): void {
+  constructor(
+    private route: ActivatedRoute,
+    private api: ApiService,
+    private sanitizer: DomSanitizer,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (!id) {
@@ -38,12 +48,15 @@ export class VideoPlayer implements OnInit {
         if (err.status === 401) {
           this.router.navigate(['/login']);
         } else {
-          this.error = `Failed to load video — ${err.status}: ${err.statusText}`;
+          this.error = `Failed to load video - ${err.status}: ${err.statusText}`;
           this.isLoading = false;
           this.cdr.detectChanges();
         }
       }
     });
   }
-  goBack() { window.history.back(); }
+
+  goBack() {
+    window.history.back();
+  }
 }
