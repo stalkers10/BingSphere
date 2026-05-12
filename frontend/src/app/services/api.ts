@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, finalize, Observable, of, shareReplay, tap } from 'rxjs';
 import { HomePageResponse } from '../models/home';
 import { Movie } from '../models/movie';
 import { ChangePasswordPayload, UserProfile } from '../models/profile';
@@ -22,6 +22,8 @@ export class ApiService {
   private watchlistUrl = '/api/watchlist/';
   private profileUrl = '/api/profile/';
   private passwordUrl = '/api/profile/password/';
+  private profileSubject = new BehaviorSubject<UserProfile | null>(null);
+  private profileRequest$: Observable<UserProfile> | null = null;
 
   constructor(private http: HttpClient) { }
 
@@ -45,16 +47,53 @@ export class ApiService {
     return this.http.get<Movie>(`${this.moviesUrl}${id}/`);
   }
 
-  getProfile(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(this.profileUrl);
+  profileChanges(): Observable<UserProfile | null> {
+    return this.profileSubject.asObservable();
+  }
+
+  getProfileSnapshot() {
+    return this.profileSubject.value;
+  }
+
+  clearProfileState() {
+    this.profileSubject.next(null);
+    this.profileRequest$ = null;
+  }
+
+  getProfile(forceRefresh = false): Observable<UserProfile> {
+    if (!forceRefresh) {
+      const cachedProfile = this.profileSubject.value;
+
+      if (cachedProfile) {
+        return of(cachedProfile);
+      }
+
+      if (this.profileRequest$) {
+        return this.profileRequest$;
+      }
+    }
+
+    this.profileRequest$ = this.http.get<UserProfile>(this.profileUrl).pipe(
+      tap((profile) => this.profileSubject.next(profile)),
+      finalize(() => {
+        this.profileRequest$ = null;
+      }),
+      shareReplay(1),
+    );
+
+    return this.profileRequest$;
   }
 
   updateProfileAvatar(formData: FormData): Observable<UserProfile> {
-    return this.http.patch<UserProfile>(this.profileUrl, formData);
+    return this.http.patch<UserProfile>(this.profileUrl, formData).pipe(
+      tap((profile) => this.profileSubject.next(profile)),
+    );
   }
 
   removeProfileAvatar(): Observable<UserProfile> {
-    return this.http.patch<UserProfile>(this.profileUrl, { remove_avatar: true });
+    return this.http.patch<UserProfile>(this.profileUrl, { remove_avatar: true }).pipe(
+      tap((profile) => this.profileSubject.next(profile)),
+    );
   }
 
   changePassword(payload: ChangePasswordPayload): Observable<{ message: string }> {

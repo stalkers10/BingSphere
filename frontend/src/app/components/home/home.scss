@@ -246,6 +246,35 @@
   grid-template-columns: repeat(auto-fit, minmax(14rem, 20rem));
 }
 
+.poster-row--scrollable {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.6rem;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+
+.poster-row--scrollable::-webkit-scrollbar {
+  height: 0.55rem;
+}
+
+.poster-row--scrollable::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 180, 170, 0.32);
+}
+
+.poster-row--scrollable .poster-card {
+  flex: 0 0 clamp(11rem, 18vw, 16rem);
+  scroll-snap-align: start;
+}
+
+.poster-row--scrollable.poster-row--compact .poster-card {
+  flex-basis: clamp(14rem, 24vw, 20rem);
+}
+
 .continue-card,
 .poster-card,
 .spotlight-card {
@@ -555,6 +584,14 @@
 
   .poster-row--compact {
     grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .poster-row--scrollable .poster-card {
+    flex-basis: min(70vw, 12rem);
+  }
+
+  .poster-row--scrollable.poster-row--compact .poster-card {
+    flex-basis: min(82vw, 16rem);
   }
 
   .footer__grid {

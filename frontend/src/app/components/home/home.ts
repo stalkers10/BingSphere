@@ -13,6 +13,7 @@ interface BrowseRow {
   title: string;
   description: string;
   displayStyle: 'poster' | 'landscape';
+  layout: 'grid' | 'horizontal';
   movies: Movie[];
 }
 
@@ -38,8 +39,6 @@ export class Home implements OnInit {
       <text x="50%" y="54%" fill="#ffffff" fill-opacity="0.72" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">Bings Sphere</text>
     </svg>`,
   )}`;
-  readonly userInitial = 'U';
-
   catalog: Movie[] = [];
   filteredMovies: Movie[] = [];
   collections: HomeCollection[] = [];
@@ -195,13 +194,22 @@ export class Home implements OnInit {
     this.featuredMovie = filtered[0] ?? this.defaultFeaturedMovie;
 
     if (!query) {
-      this.visibleRows = this.collections.map((collection) => ({
-        id: collection.slug,
-        title: collection.title,
-        description: collection.description,
-        displayStyle: collection.display_style,
-        movies: collection.items.map((item) => item.movie),
-      }));
+      this.visibleRows = this.collections.map((collection) => {
+        const isTrendingCollection = this.isTrendingCollection(collection);
+
+        return {
+          id: collection.slug,
+          title: collection.title,
+          description: collection.description,
+          displayStyle: collection.display_style,
+          layout: isTrendingCollection ? 'horizontal' : 'grid',
+          movies: collection.items
+            .slice()
+            .sort((left, right) => left.position - right.position)
+            .map((item) => item.movie)
+            .slice(0, isTrendingCollection ? 10 : undefined),
+        };
+      });
       return;
     }
 
@@ -212,10 +220,17 @@ export class Home implements OnInit {
             title: 'Search Results',
             description: `${filtered.length} title${filtered.length === 1 ? '' : 's'} matched your search.`,
             displayStyle: 'poster',
+            layout: 'grid',
             movies: filtered,
           },
         ]
       : [];
+  }
+
+  private isTrendingCollection(collection: Pick<HomeCollection, 'slug' | 'title'>) {
+    const slug = collection.slug?.trim().toLowerCase() ?? '';
+    const title = collection.title?.trim().toLowerCase() ?? '';
+    return slug.includes('trending') || title.includes('trending');
   }
 
   private showFeedback(message: string, tone: 'success' | 'error') {

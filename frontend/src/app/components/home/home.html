@@ -2,7 +2,6 @@
   <app-navbar
     [showSearch]="true"
     [searchQuery]="searchQuery"
-    [userInitial]="userInitial"
     (searchQueryChange)="onSearchChange($event)"
   ></app-navbar>
 
@@ -117,7 +116,11 @@
           
         </div>
 
-        <div class="poster-row" [class.poster-row--compact]="row.displayStyle === 'landscape'">
+        <div
+          class="poster-row"
+          [class.poster-row--compact]="row.displayStyle === 'landscape'"
+          [class.poster-row--scrollable]="row.layout === 'horizontal'"
+        >
           <article
             *ngFor="let movie of row.movies; trackBy: trackByMovieId"
             class="poster-card"

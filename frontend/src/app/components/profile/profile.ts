@@ -32,7 +32,7 @@ export class Profile implements OnInit, OnDestroy {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
-  userInitial = 'U';
+  private hasAvatarLoadError = false;
 
   constructor(
     private apiService: ApiService,
@@ -49,7 +49,15 @@ export class Profile implements OnInit, OnDestroy {
   }
 
   get avatarSource() {
+    if (this.hasAvatarLoadError) {
+      return null;
+    }
+
     return this.avatarPreviewUrl || this.profile?.avatar_url || null;
+  }
+
+  get profileInitial() {
+    return this.buildUserInitial(this.profile);
   }
 
   get displayName() {
@@ -85,6 +93,7 @@ export class Profile implements OnInit, OnDestroy {
     }
 
     this.clearPreviewUrl();
+    this.hasAvatarLoadError = false;
     this.avatarPreviewUrl = URL.createObjectURL(file);
     this.isUploadingAvatar = true;
 
@@ -102,7 +111,7 @@ export class Profile implements OnInit, OnDestroy {
       .subscribe({
         next: (profile) => {
           this.profile = profile;
-          this.userInitial = this.buildUserInitial(profile.username);
+          this.hasAvatarLoadError = false;
           this.clearPreviewUrl();
           this.setProfileFeedback('Avatar updated successfully.', 'success');
         },
@@ -133,6 +142,7 @@ export class Profile implements OnInit, OnDestroy {
       .subscribe({
         next: (profile) => {
           this.profile = profile;
+          this.hasAvatarLoadError = false;
           this.clearPreviewUrl();
           this.setProfileFeedback('Avatar removed.', 'success');
         },
@@ -212,7 +222,7 @@ export class Profile implements OnInit, OnDestroy {
       .subscribe({
         next: (profile) => {
           this.profile = profile;
-          this.userInitial = this.buildUserInitial(profile.username);
+          this.hasAvatarLoadError = false;
           this.error = null;
         },
         error: (err) => {
@@ -226,8 +236,20 @@ export class Profile implements OnInit, OnDestroy {
       });
   }
 
-  private buildUserInitial(username: string | null | undefined) {
-    return (username?.trim().charAt(0) || 'U').toUpperCase();
+  onAvatarImageError() {
+    this.hasAvatarLoadError = true;
+  }
+
+  private buildUserInitial(profile: UserProfile | null) {
+    const source = [
+      profile?.full_name,
+      profile?.first_name,
+      profile?.username,
+    ]
+      .find((value) => value?.trim())
+      ?.trim();
+
+    return (source?.charAt(0) || 'U').toUpperCase();
   }
 
   private setProfileFeedback(message: string, tone: 'success' | 'error') {

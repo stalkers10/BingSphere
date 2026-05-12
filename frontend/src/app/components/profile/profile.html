@@ -1,5 +1,5 @@
 <div class="profile-page">
-  <app-navbar [userInitial]="userInitial"></app-navbar>
+  <app-navbar></app-navbar>
 
   <main class="profile-main">
     <section *ngIf="isLoading" class="state-card">
@@ -18,8 +18,13 @@
 
         <div class="profile-hero">
           <div class="profile-avatar" [class.profile-avatar--empty]="!avatarSource">
-            <img *ngIf="avatarSource" [src]="avatarSource" [alt]="profile.username + ' avatar'" />
-            <span *ngIf="!avatarSource" class="material-symbols-outlined">person</span>
+            <img
+              *ngIf="avatarSource"
+              [src]="avatarSource"
+              [alt]="profile.username + ' avatar'"
+              (error)="onAvatarImageError()"
+            />
+            <span *ngIf="!avatarSource" class="profile-avatar__initial">{{ profileInitial }}</span>
           </div>
 
           <div class="profile-copy">
@@ -53,7 +58,7 @@
         </div>
 
         <p class="section-copy">
-          Upload a photo for your account. If no avatar is saved, the default person icon stays visible.
+          Upload a photo for your account. If no avatar is saved, your profile initial is shown.
         </p>
 
         <div *ngIf="profileFeedback" class="feedback-pill" [class.feedback-pill--error]="profileFeedbackTone === 'error'">

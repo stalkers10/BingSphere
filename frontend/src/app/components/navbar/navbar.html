@@ -48,7 +48,14 @@
       [routerLinkActiveOptions]="{ exact: true }"
       aria-label="Profile"
     >
-      {{ userInitial }}
+      <img
+        *ngIf="avatarUrl"
+        class="profile-badge__image"
+        [src]="avatarUrl"
+        [alt]="profileLabel + ' avatar'"
+        (error)="onAvatarError()"
+      />
+      <span *ngIf="!avatarUrl" class="profile-badge__initial">{{ resolvedInitial }}</span>
     </a>
 
     <button class="logout-button" type="button" (click)="logout()">Logout</button>

@@ -101,8 +101,10 @@
   color: rgba(255, 218, 213, 0.8);
 }
 
-.profile-avatar--empty .material-symbols-outlined {
-  font-size: 3rem;
+.profile-avatar__initial {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .profile-copy h1 {

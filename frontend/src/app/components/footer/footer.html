@@ -1,14 +1,15 @@
 <footer class="footer">
-  <div class="footer__brand">Bingshere</div>
+  <div class="footer__brand">Bingsphere</div>
 
   <div class="footer__grid">
-    <div *ngFor="let column of footerColumns" class="footer__column">
-      <button *ngFor="let item of column" type="button" class="footer-link">
-        {{ item }}
-      </button>
-    </div>
+    <a
+      *ngFor="let item of footerLinks"
+      class="footer-link"
+      [routerLink]="item.route"
+    >
+      {{ item.label }}
+    </a>
   </div>
 
-  <button type="button" class="service-code">Service Code</button>
-  <p class="footer__copyright">(c) 2025-2026 Bingshere, Inc.</p>
+  <p class="footer__copyright">(c) 2025-2026 Bingsphere, Inc.</p>
 </footer>

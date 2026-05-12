@@ -14,7 +14,6 @@ import { NavbarComponent } from '../navbar/navbar';
   styleUrl: './video-player.scss',
 })
 export class VideoPlayer implements OnInit {
-  readonly userInitial = 'U';
   movie: any;
   safeUrl!: SafeResourceUrl;
   isLoading = true;
